@@ -1,0 +1,8 @@
+<launch>
+    <node name="autobahn_connector" pkg="network_connector" type="autobahn_connector.py" output="screen"/>
+ 
+    <rosparam param="pub2net_topics">['/odom', '/scan']</rosparam>
+    <rosparam param="sub2net_topics">['/map', '/tf']</rosparam>
+
+
+</launch>
