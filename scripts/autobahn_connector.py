@@ -9,12 +9,12 @@ import argparse
 import six
 import rospy
 from std_msgs.msg import String
-from rostopic import get_topic_type
 
-from rosbridge_library.internal import ros_loader, message_conversion
-from rosbridge_library.internal.topics import TopicNotEstablishedException
-from rosbridge_library.internal.topics import TypeConflictException
-from rosbridge_library.internal.outgoing_message import OutgoingMessage
+from rostopic import get_topic_type
+from rosbridge_library.internal import ros_loader
+
+from network_connector.Subscriber_Handler import Subscriber_Handler
+
 
 
 url = u'ws://localhost:8080/ws'
@@ -27,8 +27,6 @@ def get_parameters():
     sub2net_topics = rospy.get_param("sub2net_topics")
 
 
-def callback(data):
-    rospy.loginfo(data.data)
 
 
 
@@ -36,19 +34,14 @@ if __name__ == "__main__":
     rospy.init_node('autobahn_connector', anonymous=False)
     get_parameters()
 
-    rospy.Subscriber("/test", String, lambda data: callback(data))
-
-    topic_type = get_topic_type("/test")[0]
-
-    print(topic_type)
-
-
+    for topic_name in pub2net_topics:
+        topic_type = get_topic_type(topic_name)[0]
+        subscriber_Handler = Subscriber_Handler(topic_name,topic_type)
+        msg_class = ros_loader.get_message_class(topic_type)
+        rospy.Subscriber(topic_name, msg_class, subscriber_Handler.callback)
 
 
 
-
-    #for topic in sub2net_topics:
-    #    print (topic)
     #run([component])
     while not rospy.is_shutdown():
         rospy.spin()
