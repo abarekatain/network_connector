@@ -1,9 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
-from autobahn.twisted.component import Component, run
-from autobahn.twisted.util import sleep
 from twisted.internet.defer import inlineCallbacks
+from autobahn.twisted.wamp import ApplicationSession, ApplicationRunner
 import os
 import argparse
 import six
@@ -18,15 +17,33 @@ from network_connector.Subscriber_Handler import Subscriber_Handler
 
 
 url = u'ws://localhost:8080/ws'
-realmv = u'realm1'
-component = Component(transports=url, realm=realmv)
+realm = u'realm1'
 
 def get_parameters():
     global pub2net_topics , sub2net_topics
     pub2net_topics = rospy.get_param("pub2net_topics")
     sub2net_topics = rospy.get_param("sub2net_topics")
+    robotID = rospy.get_param("robotID")
 
+class ClientSession(ApplicationSession):
 
+    @inlineCallbacks
+    def onJoin(self, details):
+        print("Session Attached")
+        self.handle_ros_subscribers()
+        res = yield self.register(self)
+        
+
+    def handle_ros_subscribers(self):
+
+        for topic_name in pub2net_topics:
+
+            topic_type = get_topic_type(topic_name)[0]
+            msg_class = ros_loader.get_message_class(topic_type)
+
+            subscriber_Handler = Subscriber_Handler(topic_name,topic_type,self)
+
+            rospy.Subscriber(topic_name, msg_class, subscriber_Handler.callback)
 
 
 
@@ -34,15 +51,8 @@ if __name__ == "__main__":
     rospy.init_node('autobahn_connector', anonymous=False)
     get_parameters()
 
-    for topic_name in pub2net_topics:
-        topic_type = get_topic_type(topic_name)[0]
-        subscriber_Handler = Subscriber_Handler(topic_name,topic_type)
-        msg_class = ros_loader.get_message_class(topic_type)
-        rospy.Subscriber(topic_name, msg_class, subscriber_Handler.callback)
 
+    runner = ApplicationRunner(url=url, realm=realm)
+    runner.run(ClientSession, auto_reconnect=True)
 
-
-    #run([component])
-    while not rospy.is_shutdown():
-        rospy.spin()
     print("main gone")

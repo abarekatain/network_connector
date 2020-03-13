@@ -3,6 +3,6 @@
  
     <rosparam param="pub2net_topics">['/test', '/testtt']</rosparam>
     <rosparam param="sub2net_topics">['/map', '/tf']</rosparam>
-
+    <rosparam param="robotID">'testbot'</rosparam>
 
 </launch>
