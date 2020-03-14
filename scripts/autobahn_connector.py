@@ -7,6 +7,7 @@ import os
 import argparse
 import six
 import rospy
+import json
 from std_msgs.msg import String
 
 from rostopic import get_topic_type
@@ -20,19 +21,47 @@ url = u'ws://localhost:8080/ws'
 realm = u'realm1'
 
 def get_parameters():
-    global pub2net_topics , sub2net_topics
+    global pub2net_topics , sub2net_topics, robotID
     pub2net_topics = rospy.get_param("pub2net_topics")
     sub2net_topics = rospy.get_param("sub2net_topics")
     robotID = rospy.get_param("robotID")
+    
 
 class ClientSession(ApplicationSession):
 
     @inlineCallbacks
     def onJoin(self, details):
         print("Session Attached")
-        self.handle_ros_subscribers()
-        res = yield self.register(self)
         
+        #res = yield self.register(self)
+        self.network_subscribe_topic = "com.{}.robot".format(robotID)
+        sub = yield self.subscribe(self.on_event, self.network_subscribe_topic)
+        print(self.network_subscribe_topic)
+
+        self.handle_ros_subscribers()
+
+
+
+
+
+        
+
+    def on_event(self, message):
+        #process the message
+        msg_dict = json.loads(message)
+        topic = msg_dict['topic_name']
+        topic_type = msg_dict['topic_type']
+        del msg_dict['topic_name']
+        del msg_dict['topic_type']
+        msg = json.dumps(msg_dict)
+
+        #get the topic type
+        msg_class = ros_loader.get_message_class(topic_type)
+
+
+
+
+
 
     def handle_ros_subscribers(self):
 
@@ -46,6 +75,8 @@ class ClientSession(ApplicationSession):
             subscriber_Handler = Subscriber_Handler(topic_name,topic_type)
 
             rospy.Subscriber(topic_name, msg_class, subscriber_Handler.callback)
+
+            
 
 
 

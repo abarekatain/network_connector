@@ -12,7 +12,7 @@ class Subscriber_Handler():
         self.topic_name = topic_name
         self.topic_type = topic_type
         self.robotID = rospy.get_param("robotID")
-        self.network_topic_name = "com.{}.robot".format(self.robotID)
+        self.network_publish_topic = "com.{}.robot".format(self.robotID)
         #self.session = clientSession
         
 
@@ -24,6 +24,6 @@ class Subscriber_Handler():
         json_str['topic_type'] = self.topic_type
         json_str = json.dumps(json_str)
         #print(json_str)
-        Subscriber_Handler.session.publish(self.network_topic_name, json_str)
+        Subscriber_Handler.session.publish(self.network_publish_topic, json_str)
         #print(type(self.session))
         
