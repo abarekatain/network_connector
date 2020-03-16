@@ -1,7 +1,7 @@
 <launch>
     <node name="autobahn_connector" pkg="network_connector" type="autobahn_connector.py" output="screen"/>
  
-    <rosparam param="pub2net_topics">['/test', '/testtt']</rosparam>
+    <rosparam param="pub2net_topics">['/twisttest', '/testtt']</rosparam>
     <rosparam param="sub2net_topics">['/map', '/tf']</rosparam>
     <rosparam param="robotID">'testbot'</rosparam>
 

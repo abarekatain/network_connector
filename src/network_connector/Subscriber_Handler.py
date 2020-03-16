@@ -1,7 +1,7 @@
 import rospy
-from rospy_message_converter import json_message_converter
-from std_msgs.msg import *
 import json
+
+from rosbridge_library.internal.outgoing_message import OutgoingMessage
 
 class Subscriber_Handler():
 
@@ -13,17 +13,16 @@ class Subscriber_Handler():
         self.topic_type = topic_type
         self.robotID = rospy.get_param("robotID")
         self.network_publish_topic = "com.{}.robot".format(self.robotID)
-        #self.session = clientSession
         
 
     def callback(self,message):
 
-        json_str = json_message_converter.convert_ros_message_to_json(message)
-        json_str = json.loads(json_str)
+        outgoing = OutgoingMessage(message)
+        json_str = outgoing.get_json_values()
         json_str['topic_name'] = self.topic_name
         json_str['topic_type'] = self.topic_type
         json_str = json.dumps(json_str)
-        #print(json_str)
+        
         Subscriber_Handler.session.publish(self.network_publish_topic, json_str)
-        #print(type(self.session))
+        
         
