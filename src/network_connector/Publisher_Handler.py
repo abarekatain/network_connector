@@ -14,6 +14,10 @@ class Publisher_Handler():
 
     def on_event(self, message):
         #process the message
+
+        #replace JSON Null values in float32 types with infinity datatype (changed according to the error for LaserScan values)
+        message = message.replace("null", "Infinity")
+
         msg_dict = json.loads(message)
         topic_name = msg_dict['topic_name']
         topic_type = msg_dict['topic_type']
