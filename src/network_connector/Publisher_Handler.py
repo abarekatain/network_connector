@@ -34,6 +34,6 @@ class Publisher_Handler():
         message_conversion.populate_instance(msg_dict, inst)
 
         if not topic_name in self.pub_objects:
-            self.pub_objects[topic_name] = rospy.Publisher(topic_name, msg_class, queue_size=10)
+            self.pub_objects[topic_name] = rospy.Publisher(topic_name, msg_class, latch=True, queue_size=10)
 
         self.pub_objects[topic_name].publish(inst)    

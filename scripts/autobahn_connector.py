@@ -53,9 +53,8 @@ class ClientSession(ApplicationSession):
 
         for topic_name in pub2net_topics:
 
-            topic_type = get_topic_type(topic_name)[0]
+            topic_type = get_topic_type(topic_name)[0] 
             msg_class = ros_loader.get_message_class(topic_type)
-            
             subscriber_Handler = Subscriber_Handler(topic_name,topic_type)
 
             rospy.Subscriber(topic_name, msg_class, subscriber_Handler.callback)
